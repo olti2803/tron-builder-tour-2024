@@ -15,6 +15,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
+import {
   AreaChart,
   Area,
   PieChart,
@@ -61,6 +71,21 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"]
 
 export function TronInvestorDashboardComponent() {
   const [selectedTab, setSelectedTab] = useState("overview")
+  const [newProjectName, setNewProjectName] = useState("")
+  const [newProjectDescription, setNewProjectDescription] = useState("")
+  const [newProjectInvestment, setNewProjectInvestment] = useState("")
+
+  const handleCreateProject = () => {
+  console.log("Project Created:", {
+    name: newProjectName,
+    description: newProjectDescription,
+    investment: newProjectInvestment,
+  })
+  // Reset fields after project creation
+  setNewProjectName("")
+  setNewProjectDescription("")
+  setNewProjectInvestment("")
+}
 
   const renderContent = () => {
     switch (selectedTab) {
@@ -253,9 +278,53 @@ export function TronInvestorDashboardComponent() {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Featured Projects</h2>
-              <Button className="bg-red-600 hover:bg-red-700">
-                <PlusCircle className="mr-2 h-4 w-4" /> Create Project
-              </Button>
+              <Dialog>
+  <DialogTrigger asChild>
+    <Button className="bg-red-600 hover:bg-red-700">
+      <PlusCircle className="mr-2 h-4 w-4" /> Create Project
+    </Button>
+  </DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Create New Project</DialogTitle>
+    </DialogHeader>
+    <div className="grid gap-4 py-4">
+      {/* Project Name Input */}
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="project-name" className="text-right">Project Name</Label>
+        <Input
+          id="project-name"
+          value={newProjectName}
+          onChange={(e) => setNewProjectName(e.target.value)}
+          className="col-span-3"
+        />
+      </div>
+      {/* Project Description Input */}
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="project-description" className="text-right">Description</Label>
+        <Input
+          id="project-description"
+          value={newProjectDescription}
+          onChange={(e) => setNewProjectDescription(e.target.value)}
+          className="col-span-3"
+        />
+      </div>
+      {/* Goal Input */}
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="project-goal" className="text-right">Goal (TRX)</Label>
+        <Input
+          id="project-goal"
+          value={newProjectInvestment}
+          onChange={(e) => setNewProjectInvestment(e.target.value)}
+          className="col-span-3"
+        />
+      </div>
+    </div>
+    <DialogFooter>
+      <Button onClick={handleCreateProject}>Create</Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
             </div>
             <Card>
               <CardContent className="p-6">
