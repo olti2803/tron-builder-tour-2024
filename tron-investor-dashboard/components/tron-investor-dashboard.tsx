@@ -396,50 +396,56 @@ export function TronInvestorDashboardComponent() {
 
   return (
     <div className="flex h-screen bg-white">
-      {/* Sidebar */}
-      <div className="w-64 bg-red-600 text-white p-4">
-        <div className="flex items-center mb-8">
-          <span className="text-lg font-bold">TRON Investor</span>
-        </div>
-        <nav className="space-y-2">
-          <Button
-            variant="ghost"
-            className={`w-full justify-start ${
-              selectedTab === "overview" ? "bg-red-700" : ""
-            }`}
-            onClick={() => setSelectedTab("overview")}
-          >
-            <Home className="mr-2 h-4 w-4" /> Overview
-          </Button>
-          <Button
-            variant="ghost"
-            className={`w-full justify-start ${
-              selectedTab === "investments" ? "bg-red-700" : ""
-            }`}
-            onClick={() => setSelectedTab("investments")}
-          >
-            <DollarSign className="mr-2 h-4 w-4" /> Investments
-          </Button>
-          <Button
-            variant="ghost"
-            className={`w-full justify-start ${
-              selectedTab === "projects" ? "bg-red-700" : ""
-            }`}
-            onClick={() => setSelectedTab("projects")}
-          >
-            <Briefcase className="mr-2 h-4 w-4" /> Projects
-          </Button>
-          <Button
-            variant="ghost"
-            className={`w-full justify-start ${
-              selectedTab === "network" ? "bg-red-700" : ""
-            }`}
-            onClick={() => setSelectedTab("network")}
-          >
-            <Activity className="mr-2 h-4 w-4" /> Network
-          </Button>
-        </nav>
-      </div>
+{/* Sidebar */}
+<div className="w-64 md:w-48 lg:w-56 xl:w-64 bg-red-600 text-white p-4 h-screen flex flex-col justify-between">
+  <div className="flex flex-col space-y-8">
+    {/* Add logo to the sidebar */}
+    <div className="flex items-center mb-2">
+  <img src="/Minimalist_TRON_FundYou_logo.png" alt="TRON-FundYou Logo" className="w-20 h-20 mr-2" />
+  <span className="text-xl font-normal">TRON - FundYou</span>
+</div>
+    {/* Horizontal line below the logo */}
+    <hr className="border-gray-400 mb-4 w-full" />
+
+    <nav className="space-y-2">
+      <Button
+        variant="ghost"
+        className={`w-full justify-start py-6 px-8 text-xl ${selectedTab === "overview" ? "bg-red-700" : ""}`}
+        onClick={() => setSelectedTab("overview")}
+      >
+        <Home className="mr-4 h-6 w-6" /> Overview
+      </Button>
+      <Button
+        variant="ghost"
+        className={`w-full justify-start py-6 px-8 text-xl ${selectedTab === "investments" ? "bg-red-700" : ""}`}
+        onClick={() => setSelectedTab("investments")}
+      >
+        <DollarSign className="mr-4 h-6 w-6" /> Investments
+      </Button>
+      <Button
+        variant="ghost"
+        className={`w-full justify-start py-6 px-8 text-xl ${selectedTab === "projects" ? "bg-red-700" : ""}`}
+        onClick={() => setSelectedTab("projects")}
+      >
+        <Briefcase className="mr-4 h-6 w-6" /> Projects
+      </Button>
+      <Button
+        variant="ghost"
+        className={`w-full justify-start py-6 px-8 text-xl ${selectedTab === "network" ? "bg-red-700" : ""}`}
+        onClick={() => setSelectedTab("network")}
+      >
+        <Activity className="mr-4 h-6 w-6" /> Network
+      </Button>
+    </nav>
+  </div>
+  <div className="hidden md:block mt-auto text-sm text-gray-300">
+    <p>TRON-FundYou</p>
+    <p>© 2024 All Rights Reserved</p>
+  </div>
+</div>
+
+
+
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
