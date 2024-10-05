@@ -1,22 +1,22 @@
 "use client"
 
-import { useState } from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useState, useEffect } from "react";
+import TronWeb from 'tronweb';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import axios from 'axios';
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useEffect } from "react";
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { getTronPriceData } from "@/lib/api";
 
 import {
@@ -27,25 +27,11 @@ import {
   DialogTitle,
   DialogFooter,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
 import {
-  AreaChart,
-  Area,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts"
-import {
   Coins,
-  Users,
   TrendingUp,
-  BarChart as BarChartIcon,
   Bell,
   Search,
   Home,
@@ -53,8 +39,49 @@ import {
   Briefcase,
   Activity,
   PlusCircle,
-} from "lucide-react"
-import WalletConnection from "./wallet-connection" // Adjust the import path accordingly
+} from "lucide-react";
+import WalletConnection from "./wallet-connection"; // Adjust the import path accordingly
+
+// Replace with your actual contract address
+const contractAddress = 'TSKqM7bDSMDvedeSPdnWWRiZS8sLNH3PsX';
+
+// Replace with your contract's ABI
+const contractABI = [
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_title", "type": "string" },
+      { "internalType": "string", "name": "_bio", "type": "string" },
+      { "internalType": "address payable", "name": "_campaignWallet", "type": "address" },
+      { "internalType": "uint256", "name": "_campaignGoal", "type": "uint256" }
+    ],
+    "name": "createProject",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_projectId", "type": "uint256" }],
+    "name": "donateTRX",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_projectId", "type": "uint256" }],
+    "name": "getProject",
+    "outputs": [
+      { "internalType": "string", "name": "title", "type": "string" },
+      { "internalType": "string", "name": "bio", "type": "string" },
+      { "internalType": "address", "name": "campaignWallet", "type": "address" },
+      { "internalType": "uint256", "name": "campaignGoal", "type": "uint256" },
+      { "internalType": "uint256", "name": "totalRaisedTRX", "type": "uint256" },
+      { "internalType": "address", "name": "raiser", "type": "address" },
+      { "internalType": "bool", "name": "active", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
 
 export function TronInvestorDashboardComponent() {
   const [selectedTab, setSelectedTab] = useState("overview");
@@ -63,6 +90,9 @@ export function TronInvestorDashboardComponent() {
   const [newProjectInvestment, setNewProjectInvestment] = useState("");
   const [walletAddress, setWalletAddress] = useState(""); 
   const [tronData, setTronData] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [fundingProjectId, setFundingProjectId] = useState(null);
+  const [fundingAmount, setFundingAmount] = useState("");
 
   useEffect(() => {
     if (selectedTab === "overview") {
@@ -74,20 +104,88 @@ export function TronInvestorDashboardComponent() {
     }
   }, [selectedTab]);
 
-  const handleCreateProject = () => {
-    console.log("Project Created:", {
-      name: newProjectName,
-      description: newProjectDescription,
-      investment: newProjectInvestment,
-      walletAddress,
-    });
-    // Reset fields after project creation
-    setNewProjectName("");
-    setNewProjectDescription("");
-    setNewProjectInvestment("");
-    setWalletAddress("");
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+      const tronWeb = window.tronWeb;
+      const contract = await tronWeb.contract(contractABI, contractAddress);
+
+      const projectsArray = [];
+      for (let i = 1; i <= 4; i++) { // Fetch projects 1-4 (limit to 4 projects)
+        try {
+          const project = await contract.getProject(i).call();
+          projectsArray.push({
+            id: i,
+            title: project.title,
+            bio: project.bio,
+            campaignWallet: project.campaignWallet,
+            campaignGoal: tronWeb.fromSun(project.campaignGoal),  // Convert from SUN to TRX
+            totalRaisedTRX: tronWeb.fromSun(project.totalRaisedTRX),  // Convert from SUN to TRX
+            raiser: project.raiser,
+            active: project.active,
+          });
+        } catch (error) {
+          console.error(`Error fetching project ${i}:`, error);
+        }
+      }
+      setProjects(projectsArray);
+    }
   };
-  
+
+  const handleCreateProject = async () => {
+    if (!window.tronWeb || !window.tronWeb.defaultAddress.base58) {
+      alert('Please connect your wallet first');
+      return;
+    }
+    try {
+      const contract = await window.tronWeb.contract(contractABI, contractAddress);
+      const tx = await contract.createProject(
+        newProjectName,
+        newProjectDescription,
+        walletAddress,
+        window.tronWeb.toSun(newProjectInvestment)
+      ).send({
+        from: window.tronWeb.defaultAddress.base58,
+      });
+      console.log('Project Created:', tx);
+      setNewProjectName('');
+      setNewProjectDescription('');
+      setNewProjectInvestment('');
+      setWalletAddress('');
+      fetchProjects();
+    } catch (error) {
+      console.error('Error creating project:', error);
+      alert('Error creating project: ' + error.message);
+    }
+  };
+
+  const handleFundProject = (projectId) => {
+    setFundingProjectId(projectId);
+  };
+
+  const donateToProject = async () => {
+    if (!window.tronWeb || !window.tronWeb.defaultAddress.base58) {
+      alert('Please connect your wallet first');
+      return;
+    }
+    try {
+      const contract = await window.tronWeb.contract(contractABI, contractAddress);
+      const tx = await contract.donateTRX(fundingProjectId).send({
+        from: window.tronWeb.defaultAddress.base58,
+        callValue: window.tronWeb.toSun(fundingAmount),
+      });
+      console.log('Donation successful:', tx);
+      setFundingAmount("");
+      setFundingProjectId(null);
+      fetchProjects();
+    } catch (error) {
+      console.error('Error donating to project:', error);
+      alert('Error donating to project: ' + error.message);
+    }
+  };
 
   const renderContent = () => {
     switch (selectedTab) {
@@ -98,7 +196,7 @@ export function TronInvestorDashboardComponent() {
             <div className="bg-red-100 p-6 rounded-lg text-center">
               <h1 className="text-3xl font-bold text-red-600">TRON - FundYou Overview</h1>
               <p className="text-lg mt-2 text-gray-700">
-                Welcome to the TRON Investor Dashboard! Here you can find real-time data on TRON's cryptocurrency, including current price, market trends, and volume. Here you can also donate your TRX funds to different projects from various collaborators.
+                Welcome to the TRON Investor Dashboard! Here you can find real-time data on TRON's cryptocurrency, including current price, market trends, and volume.
               </p>
             </div>
 
@@ -199,6 +297,91 @@ export function TronInvestorDashboardComponent() {
           </div>
         );
 
+      case "projects":
+        return (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Featured Projects</h2>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="bg-red-600 hover:bg-red-700">
+                    <PlusCircle className="mr-2 h-4 w-4" /> Create Project
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New Project</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    {/* Project Name Input */}
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="project-name" className="text-right">Project Name</Label>
+                      <Input
+                        id="project-name"
+                        value={newProjectName}
+                        onChange={(e) => setNewProjectName(e.target.value)}
+                        className="col-span-3"
+                      />
+                    </div>
+                    {/* Project Description Input */}
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="project-description" className="text-right">Project Description</Label>
+                      <textarea
+                        id="project-description"
+                        value={newProjectDescription}
+                        onChange={(e) => setNewProjectDescription(e.target.value)}
+                        className="col-span-3 p-2 border border-gray-300 rounded"
+                        rows={5}
+                        placeholder="Provide a detailed description"
+                      />
+                    </div>
+                    {/* Wallet Address Input */}
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="wallet-address" className="text-right">Wallet Address</Label>
+                      <Input
+                        id="wallet-address"
+                        value={walletAddress}
+                        onChange={(e) => setWalletAddress(e.target.value)}
+                        className="col-span-3"
+                      />
+                    </div>
+                    {/* Funding Goal Input */}
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="funding-goal" className="text-right">Funding Goal (TRX)</Label>
+                      <Input
+                        id="funding-goal"
+                        type="number"
+                        value={newProjectInvestment}
+                        onChange={(e) => setNewProjectInvestment(e.target.value)}
+                        className="col-span-3"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button onClick={handleCreateProject}>Create</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+            {/* Display Projects */}
+            <div className="space-y-4">
+              {projects.map((project) => (
+                <Card key={project.id}>
+                  <CardHeader>
+                    <CardTitle>{project.title}</CardTitle>
+                    <CardDescription>{project.bio}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p>Goal: {project.campaignGoal} TRX</p>
+                    <p>Raised: {project.totalRaisedTRX} TRX</p>
+                    <Button onClick={() => handleFundProject(project.id)}>Fund</Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        );
+
       case "investments":
         return (
           <Card>
@@ -249,110 +432,8 @@ export function TronInvestorDashboardComponent() {
               </div>
             </CardContent>
           </Card>
-        )
-      case "projects":
-        return (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Featured Projects</h2>
-              <Dialog>
-  <DialogTrigger asChild>
-    <Button className="bg-red-600 hover:bg-red-700">
-      <PlusCircle className="mr-2 h-4 w-4" /> Create Project
-    </Button>
-  </DialogTrigger>
-  <DialogContent>
-  <DialogHeader>
-    <DialogTitle>Create New Project</DialogTitle>
-  </DialogHeader>
-  <div className="grid gap-4 py-4">
-    {/* Project Name Input */}
-    <div className="grid grid-cols-4 items-center gap-4">
-      <Label htmlFor="project-name" className="text-right">Project Name</Label>
-      <Input
-        id="project-name"
-        value={newProjectName}
-        onChange={(e) => setNewProjectName(e.target.value)}
-        className="col-span-3"
-      />
-    </div>
-    {/* Project Description Input */}
-    <div className="grid grid-cols-4 items-center gap-4">
-      <Label htmlFor="project-description" className="text-right">Project Description</Label>
-      <textarea
-        id="project-description"
-        value={newProjectDescription}
-        onChange={(e) => setNewProjectDescription(e.target.value)}
-        className="col-span-3 p-2 border border-gray-300 rounded"
-        rows={5}
-        minLength={50}
-        placeholder="Provide a detailed description (at least 50 characters)"
-      />
-    </div>
-    {/* Wallet Address Input */}
-    <div className="grid grid-cols-4 items-center gap-4">
-      <Label htmlFor="wallet-address" className="text-right">Wallet Address</Label>
-      <Input
-        id="wallet-address"
-        value={walletAddress}
-        onChange={(e) => setWalletAddress(e.target.value)}
-        className="col-span-3"
-      />
-    </div>
-    {/* Funding Goal Input */}
-    <div className="grid grid-cols-4 items-center gap-4">
-      <Label htmlFor="funding-goal" className="text-right">Funding Goal (TRX)</Label>
-      <Input
-        id="funding-goal"
-        type="number"  // Ensures only numbers are accepted
-        value={newProjectInvestment}
-        onChange={(e) => setNewProjectInvestment(e.target.value)}
-        className="col-span-3"
-      />
-    </div>
-  </div>
-  <DialogFooter>
-    <Button onClick={handleCreateProject}>Create</Button>
-  </DialogFooter>
-</DialogContent>
+        );
 
-
-</Dialog>
-            </div>
-            <Card>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  {["DeFi", "NFT", "Gaming", "Infrastructure"].map(
-                    (category) => (
-                      <div
-                        key={category}
-                        className="flex items-center space-x-4 p-2 rounded-lg hover:bg-red-50 transition-colors"
-                      >
-                        <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                          <span className="text-red-600 font-bold">
-                            {category[0]}
-                          </span>
-                        </div>
-                        <div className="flex-grow">
-                          <h3 className="font-medium">{category} Project</h3>
-                          <p className="text-sm text-muted-foreground">
-                            Innovative {category.toLowerCase()} solution on TRON
-                          </p>
-                        </div>
-                        <Button
-                          variant="outline"
-                          className="text-red-600 border-red-600 hover:bg-red-50"
-                        >
-                          Fund
-                        </Button>
-                      </div>
-                    )
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )
       case "network":
         return (
           <Card>
@@ -381,64 +462,59 @@ export function TronInvestorDashboardComponent() {
               </div>
             </CardContent>
           </Card>
-        )
+        );
+
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
     <div className="flex h-screen bg-white">
-{/* Sidebar */}
-<div className="w-64 md:w-48 lg:w-56 xl:w-64 bg-red-600 text-white p-4 h-screen flex flex-col justify-between">
-  <div className="flex flex-col space-y-8">
-    {/* Add logo to the sidebar */}
-    <div className="flex items-center mb-2">
-  <img src="/Minimalist_TRON_FundYou_logo.png" alt="TRON-FundYou Logo" className="w-20 h-20 mr-2" />
-  <span className="text-xl font-normal">TRON - FundYou</span>
-</div>
-    {/* Horizontal line below the logo */}
-    <hr className="border-gray-400 mb-4 w-full" />
-
-    <nav className="space-y-2">
-      <Button
-        variant="ghost"
-        className={`w-full justify-start py-6 px-8 text-xl ${selectedTab === "overview" ? "bg-red-700" : ""}`}
-        onClick={() => setSelectedTab("overview")}
-      >
-        <Home className="mr-4 h-6 w-6" /> Overview
-      </Button>
-      <Button
-        variant="ghost"
-        className={`w-full justify-start py-6 px-8 text-xl ${selectedTab === "investments" ? "bg-red-700" : ""}`}
-        onClick={() => setSelectedTab("investments")}
-      >
-        <DollarSign className="mr-4 h-6 w-6" /> Funds
-      </Button>
-      <Button
-        variant="ghost"
-        className={`w-full justify-start py-6 px-8 text-xl ${selectedTab === "projects" ? "bg-red-700" : ""}`}
-        onClick={() => setSelectedTab("projects")}
-      >
-        <Briefcase className="mr-4 h-6 w-6" /> Projects
-      </Button>
-      <Button
-        variant="ghost"
-        className={`w-full justify-start py-6 px-8 text-xl ${selectedTab === "network" ? "bg-red-700" : ""}`}
-        onClick={() => setSelectedTab("network")}
-      >
-        <Activity className="mr-4 h-6 w-6" /> Network
-      </Button>
-    </nav>
-  </div>
-  <div className="hidden md:block mt-auto text-sm text-gray-300">
-    <p>TRON-FundYou</p>
-    <p>© 2024 All Rights Reserved</p>
-  </div>
-</div>
-
-
-
+      {/* Sidebar */}
+      <div className="w-64 md:w-48 lg:w-56 xl:w-64 bg-red-600 text-white p-4 h-screen flex flex-col justify-between">
+        <div className="flex flex-col space-y-8">
+          <div className="flex items-center mb-2">
+            <img src="/Minimalist_TRON_FundYou_logo.png" alt="TRON-FundYou Logo" className="w-20 h-20 mr-2" />
+            <span className="text-xl font-normal">TRON - FundYou</span>
+          </div>
+          <hr className="border-gray-400 mb-4 w-full" />
+          <nav className="space-y-2">
+            <Button
+              variant="ghost"
+              className={`w-full justify-start py-6 px-8 text-xl ${selectedTab === "overview" ? "bg-red-700" : ""}`}
+              onClick={() => setSelectedTab("overview")}
+            >
+              <Home className="mr-4 h-6 w-6" /> Overview
+            </Button>
+            <Button
+              variant="ghost"
+              className={`w-full justify-start py-6 px-8 text-xl ${selectedTab === "projects" ? "bg-red-700" : ""}`}
+              onClick={() => setSelectedTab("projects")}
+            >
+              <Briefcase className="mr-4 h-6 w-6" /> Projects
+            </Button>
+            <Button
+              variant="ghost"
+              className={`w-full justify-start py-6 px-8 text-xl ${selectedTab === "investments" ? "bg-red-700" : ""}`}
+              onClick={() => setSelectedTab("investments")}
+            >
+              <DollarSign className="mr-4 h-6 w-6" /> Funds
+            </Button>
+            <Button
+              variant="ghost"
+              className={`w-full justify-start py-6 px-8 text-xl ${selectedTab === "network" ? "bg-red-700" : ""}`}
+              onClick={() => setSelectedTab("network")}
+            >
+              <Activity className="mr-4 h-6 w-6" /> Network
+            </Button>
+          </nav>
+        </div>
+        <div className="hidden md:block mt-auto text-sm text-gray-300">
+          <p>TRON-FundYou</p>
+          <p>© 2024 All Rights Reserved</p>
+        </div>
+      </div>
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -457,7 +533,6 @@ export function TronInvestorDashboardComponent() {
                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
               </div>
               <Bell className="h-6 w-6 text-gray-500 cursor-pointer" />
-              {/* Wallet Connection Component */}
               <WalletConnection />
             </div>
           </div>
@@ -465,8 +540,33 @@ export function TronInvestorDashboardComponent() {
 
         <main className="flex-1 overflow-y-auto bg-gray-50 p-4">
           <ScrollArea className="h-full">{renderContent()}</ScrollArea>
+
+          {/* Funding Dialog */}
+          {fundingProjectId && (
+            <Dialog open={fundingProjectId !== null} onOpenChange={() => setFundingProjectId(null)}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Fund Project</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="funding-amount" className="text-right">Amount (TRX)</Label>
+                    <Input
+                      id="funding-amount"
+                      value={fundingAmount}
+                      onChange={(e) => setFundingAmount(e.target.value)}
+                      className="col-span-3"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button onClick={donateToProject} className="bg-red-600 hover:bg-red-700">Fund</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
         </main>
       </div>
     </div>
-  )
+  );
 }
