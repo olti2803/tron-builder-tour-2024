@@ -3,42 +3,64 @@
 import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { Coins, Users, TrendingUp, BarChart as BarChartIcon, Link, Bell, Search, Menu, Home, DollarSign, Briefcase, Activity, PlusCircle } from "lucide-react"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog"
+import {
+  AreaChart,
+  Area,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts"
+import {
+  Coins,
+  Users,
+  TrendingUp,
+  BarChart as BarChartIcon,
+  Bell,
+  Search,
+  Home,
+  DollarSign,
+  Briefcase,
+  Activity,
+  PlusCircle,
+} from "lucide-react"
+import WalletConnection from "./wallet-connection" // Adjust the import path accordingly
 
 const projectData = [
-  { name: 'Jan', investments: 40000, users: 1200 },
-  { name: 'Feb', investments: 30000, users: 1400 },
-  { name: 'Mar', investments: 50000, users: 1600 },
-  { name: 'Apr', investments: 45000, users: 1800 },
-  { name: 'May', investments: 60000, users: 2000 },
-  { name: 'Jun', investments: 55000, users: 2200 },
+  { name: "Jan", investments: 40000, users: 1200 },
+  { name: "Feb", investments: 30000, users: 1400 },
+  { name: "Mar", investments: 50000, users: 1600 },
+  { name: "Apr", investments: 45000, users: 1800 },
+  { name: "May", investments: 60000, users: 2000 },
+  { name: "Jun", investments: 55000, users: 2200 },
 ]
 
 const pieData = [
-  { name: 'DeFi', value: 400 },
-  { name: 'NFTs', value: 300 },
-  { name: 'Gaming', value: 300 },
-  { name: 'Infrastructure', value: 200 },
+  { name: "DeFi", value: 400 },
+  { name: "NFTs", value: 300 },
+  { name: "Gaming", value: 300 },
+  { name: "Infrastructure", value: 200 },
 ]
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"]
 
 export function TronInvestorDashboardComponent() {
   const [selectedTab, setSelectedTab] = useState("overview")
-  const [walletAddress, setWalletAddress] = useState("")
-  const [isWalletConnected, setIsWalletConnected] = useState(false)
-
-  const handleConnectWallet = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsWalletConnected(true)
-  }
 
   const renderContent = () => {
     switch (selectedTab) {
@@ -48,37 +70,51 @@ export function TronInvestorDashboardComponent() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total TRX Invested</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total TRX Invested
+                  </CardTitle>
                   <Coins className="h-4 w-4 text-red-600" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">1,500,000 TRX</div>
-                  <p className="text-xs text-muted-foreground">+12% from last month</p>
+                  <p className="text-xs text-muted-foreground">
+                    +12% from last month
+                  </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Active Projects
+                  </CardTitle>
                   <TrendingUp className="h-4 w-4 text-red-600" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">28</div>
-                  <p className="text-xs text-muted-foreground">Across 5 sectors</p>
+                  <p className="text-xs text-muted-foreground">
+                    Across 5 sectors
+                  </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Returns</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total Returns
+                  </CardTitle>
                   <BarChartIcon className="h-4 w-4 text-red-600" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">22.5%</div>
-                  <p className="text-xs text-muted-foreground">Average across all projects</p>
+                  <p className="text-xs text-muted-foreground">
+                    Average across all projects
+                  </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Network Users</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Network Users
+                  </CardTitle>
                   <Users className="h-4 w-4 text-red-600" />
                 </CardHeader>
                 <CardContent>
@@ -96,16 +132,36 @@ export function TronInvestorDashboardComponent() {
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={projectData}>
                       <defs>
-                        <linearGradient id="colorInvestments" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                        <linearGradient
+                          id="colorInvestments"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#ef4444"
+                            stopOpacity={0.8}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#ef4444"
+                            stopOpacity={0}
+                          />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" />
                       <YAxis />
                       <Tooltip />
-                      <Area type="monotone" dataKey="investments" stroke="#ef4444" fillOpacity={1} fill="url(#colorInvestments)" />
+                      <Area
+                        type="monotone"
+                        dataKey="investments"
+                        stroke="#ef4444"
+                        fillOpacity={1}
+                        fill="url(#colorInvestments)"
+                      />
                     </AreaChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -127,7 +183,10 @@ export function TronInvestorDashboardComponent() {
                         dataKey="value"
                       >
                         {pieData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
                         ))}
                       </Pie>
                       <Tooltip />
@@ -143,7 +202,9 @@ export function TronInvestorDashboardComponent() {
           <Card>
             <CardHeader>
               <CardTitle>Your Investments</CardTitle>
-              <CardDescription>Track and manage your TRON investments</CardDescription>
+              <CardDescription>
+                Track and manage your TRON investments
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -154,7 +215,11 @@ export function TronInvestorDashboardComponent() {
                     <div className="text-sm text-green-600">+8.5%</div>
                   </div>
                 </div>
-                <Progress value={85} className="h-2 bg-red-200" indicatorClassName="bg-red-600" />
+                <Progress
+                  value={85}
+                  className="h-2 bg-red-200"
+                  indicatorClassName="bg-red-600"
+                />
                 <div className="flex items-center justify-between">
                   <span className="font-medium">NFT Marketplace</span>
                   <div className="text-right">
@@ -162,7 +227,11 @@ export function TronInvestorDashboardComponent() {
                     <div className="text-sm text-red-600">-2.1%</div>
                   </div>
                 </div>
-                <Progress value={62} className="h-2 bg-red-200" indicatorClassName="bg-red-600" />
+                <Progress
+                  value={62}
+                  className="h-2 bg-red-200"
+                  indicatorClassName="bg-red-600"
+                />
                 <div className="flex items-center justify-between">
                   <span className="font-medium">TRON Gaming Platform</span>
                   <div className="text-right">
@@ -170,7 +239,11 @@ export function TronInvestorDashboardComponent() {
                     <div className="text-sm text-green-600">+12.3%</div>
                   </div>
                 </div>
-                <Progress value={78} className="h-2 bg-red-200" indicatorClassName="bg-red-600" />
+                <Progress
+                  value={78}
+                  className="h-2 bg-red-200"
+                  indicatorClassName="bg-red-600"
+                />
               </div>
             </CardContent>
           </Card>
@@ -187,18 +260,32 @@ export function TronInvestorDashboardComponent() {
             <Card>
               <CardContent className="p-6">
                 <div className="space-y-4">
-                  {['DeFi', 'NFT', 'Gaming', 'Infrastructure'].map((category) => (
-                    <div key={category} className="flex items-center space-x-4 p-2 rounded-lg hover:bg-red-50 transition-colors">
-                      <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                        <span className="text-red-600 font-bold">{category[0]}</span>
+                  {["DeFi", "NFT", "Gaming", "Infrastructure"].map(
+                    (category) => (
+                      <div
+                        key={category}
+                        className="flex items-center space-x-4 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                          <span className="text-red-600 font-bold">
+                            {category[0]}
+                          </span>
+                        </div>
+                        <div className="flex-grow">
+                          <h3 className="font-medium">{category} Project</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Innovative {category.toLowerCase()} solution on TRON
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          className="text-red-600 border-red-600 hover:bg-red-50"
+                        >
+                          Invest
+                        </Button>
                       </div>
-                      <div className="flex-grow">
-                        <h3 className="font-medium">{category} Project</h3>
-                        <p className="text-sm text-muted-foreground">Innovative {category.toLowerCase()} solution on TRON</p>
-                      </div>
-                      <Button variant="outline" className="text-red-600 border-red-600 hover:bg-red-50">Invest</Button>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -248,28 +335,36 @@ export function TronInvestorDashboardComponent() {
         <nav className="space-y-2">
           <Button
             variant="ghost"
-            className={`w-full justify-start ${selectedTab === "overview" ? "bg-red-700" : ""}`}
+            className={`w-full justify-start ${
+              selectedTab === "overview" ? "bg-red-700" : ""
+            }`}
             onClick={() => setSelectedTab("overview")}
           >
             <Home className="mr-2 h-4 w-4" /> Overview
           </Button>
           <Button
             variant="ghost"
-            className={`w-full justify-start ${selectedTab === "investments" ? "bg-red-700" : ""}`}
+            className={`w-full justify-start ${
+              selectedTab === "investments" ? "bg-red-700" : ""
+            }`}
             onClick={() => setSelectedTab("investments")}
           >
             <DollarSign className="mr-2 h-4 w-4" /> Investments
           </Button>
           <Button
             variant="ghost"
-            className={`w-full justify-start ${selectedTab === "projects" ? "bg-red-700" : ""}`}
+            className={`w-full justify-start ${
+              selectedTab === "projects" ? "bg-red-700" : ""
+            }`}
             onClick={() => setSelectedTab("projects")}
           >
             <Briefcase className="mr-2 h-4 w-4" /> Projects
           </Button>
           <Button
             variant="ghost"
-            className={`w-full justify-start ${selectedTab === "network" ? "bg-red-700" : ""}`}
+            className={`w-full justify-start ${
+              selectedTab === "network" ? "bg-red-700" : ""
+            }`}
             onClick={() => setSelectedTab("network")}
           >
             <Activity className="mr-2 h-4 w-4" /> Network
@@ -281,7 +376,9 @@ export function TronInvestorDashboardComponent() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="bg-white shadow">
           <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">{selectedTab.charAt(0).toUpperCase() + selectedTab.slice(1)}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {selectedTab.charAt(0).toUpperCase() + selectedTab.slice(1)}
+            </h1>
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <Input
@@ -292,48 +389,14 @@ export function TronInvestorDashboardComponent() {
                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
               </div>
               <Bell className="h-6 w-6 text-gray-500 cursor-pointer" />
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="text-red-600 border-red-600 hover:bg-red-50">
-                    {isWalletConnected ? "Connected" : "Connect Wallet"}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Connect Your Wallet</DialogTitle>
-                    <DialogDescription>
-                      Enter your TRON wallet address to connect.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <form onSubmit={handleConnectWallet}>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="wallet" className="text-right">
-                          Wallet Address
-                        </Label>
-                        <Input
-                          id="wallet"
-                          value={walletAddress}
-                          onChange={(e) => setWalletAddress(e.target.value)}
-                          className="col-span-3"
-                          placeholder="Enter your TRON wallet address"
-                        />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button type="submit">Connect</Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
+              {/* Wallet Connection Component */}
+              <WalletConnection />
             </div>
           </div>
         </header>
 
         <main className="flex-1 overflow-y-auto bg-gray-50 p-4">
-          <ScrollArea className="h-full">
-            {renderContent()}
-          </ScrollArea>
+          <ScrollArea className="h-full">{renderContent()}</ScrollArea>
         </main>
       </div>
     </div>
