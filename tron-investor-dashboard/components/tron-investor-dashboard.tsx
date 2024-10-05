@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import axios from 'axios';
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -14,6 +16,9 @@ import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useEffect } from "react";
+import { getTronPriceData } from "@/lib/api";
+
 import {
   Dialog,
   DialogContent,
@@ -51,180 +56,149 @@ import {
 } from "lucide-react"
 import WalletConnection from "./wallet-connection" // Adjust the import path accordingly
 
-const projectData = [
-  { name: "Jan", investments: 40000, users: 1200 },
-  { name: "Feb", investments: 30000, users: 1400 },
-  { name: "Mar", investments: 50000, users: 1600 },
-  { name: "Apr", investments: 45000, users: 1800 },
-  { name: "May", investments: 60000, users: 2000 },
-  { name: "Jun", investments: 55000, users: 2200 },
-]
-
-const pieData = [
-  { name: "DeFi", value: 400 },
-  { name: "NFTs", value: 300 },
-  { name: "Gaming", value: 300 },
-  { name: "Infrastructure", value: 200 },
-]
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"]
-
 export function TronInvestorDashboardComponent() {
-  const [selectedTab, setSelectedTab] = useState("overview")
-  const [newProjectName, setNewProjectName] = useState("")
-  const [newProjectDescription, setNewProjectDescription] = useState("")
-  const [newProjectInvestment, setNewProjectInvestment] = useState("")
+  const [selectedTab, setSelectedTab] = useState("overview");
+  const [newProjectName, setNewProjectName] = useState("");
+  const [newProjectDescription, setNewProjectDescription] = useState("");
+  const [newProjectInvestment, setNewProjectInvestment] = useState("");
   const [walletAddress, setWalletAddress] = useState(""); 
+  const [tronData, setTronData] = useState(null);
 
-  
+  useEffect(() => {
+    if (selectedTab === "overview") {
+      const fetchData = async () => {
+        const data = await getTronPriceData();
+        setTronData(data);
+      };
+      fetchData();
+    }
+  }, [selectedTab]);
 
   const handleCreateProject = () => {
-  console.log("Project Created:", {
-    name: newProjectName,
-    description: newProjectDescription,
-    investment: newProjectInvestment,
-  })
-  // Reset fields after project creation
-  setNewProjectName("")
-  setNewProjectDescription("")
-  setNewProjectInvestment("")
-}
+    console.log("Project Created:", {
+      name: newProjectName,
+      description: newProjectDescription,
+      investment: newProjectInvestment,
+      walletAddress,
+    });
+    // Reset fields after project creation
+    setNewProjectName("");
+    setNewProjectDescription("");
+    setNewProjectInvestment("");
+    setWalletAddress("");
+  };
+  
 
   const renderContent = () => {
     switch (selectedTab) {
       case "overview":
         return (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
+          <div className="space-y-6">
+            {/* Overview Header Section */}
+            <div className="bg-red-100 p-6 rounded-lg text-center">
+              <h1 className="text-3xl font-bold text-red-600">TRON - FundYou Overview</h1>
+              <p className="text-lg mt-2 text-gray-700">
+                Welcome to the TRON Investor Dashboard! Here you can find real-time data on TRON's cryptocurrency, including current price, market trends, and volume. Here you can also donate your TRX funds to different projects from various collaborators.
+              </p>
+            </div>
+
+            {/* Card Sections with 2 Cards per Row */}
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Current Price */}
+              <Card className="h-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Total TRX Invested
+                    Current TRON Price (USD)
                   </CardTitle>
                   <Coins className="h-4 w-4 text-red-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">1,500,000 TRX</div>
+                  <div className="text-2xl font-bold">
+                    {tronData ? `$${tronData.market_data.current_price.usd}` : "Loading..."}
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    +12% from last month
+                    Updated in real-time
                   </p>
                 </CardContent>
               </Card>
-              <Card>
+
+              {/* Market Cap Rank */}
+              <Card className="h-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Active Projects
+                    Market Cap Rank
                   </CardTitle>
                   <TrendingUp className="h-4 w-4 text-red-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">28</div>
+                  <div className="text-2xl font-bold">
+                    {tronData ? `#${tronData.market_cap_rank}` : "Loading..."}
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    Across 5 sectors
+                    Current Market Cap Ranking
                   </p>
                 </CardContent>
               </Card>
-              <Card>
+
+              {/* Circulating Supply */}
+              <Card className="h-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Total Returns
+                    Circulating Supply
                   </CardTitle>
-                  <BarChartIcon className="h-4 w-4 text-red-600" />
+                  <Coins className="h-4 w-4 text-red-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">22.5%</div>
+                  <div className="text-2xl font-bold">
+                    {tronData ? `${tronData.market_data.circulating_supply.toLocaleString()} TRX` : "Loading..."}
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    Average across all projects
+                    Total circulating supply
                   </p>
                 </CardContent>
               </Card>
-              <Card>
+
+              {/* Trading Volume (24h) */}
+              <Card className="h-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Network Users
+                    Trading Volume (24h)
                   </CardTitle>
-                  <Users className="h-4 w-4 text-red-600" />
+                  <Coins className="h-4 w-4 text-red-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">2,345,678</div>
-                  <p className="text-xs text-muted-foreground">+5% this week</p>
+                  <div className="text-2xl font-bold">
+                    {tronData ? `$${tronData.market_data.total_volume.usd.toLocaleString()}` : "Loading..."}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Trading volume in the last 24 hours
+                  </p>
                 </CardContent>
               </Card>
             </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              <Card>
+
+            {/* Additional Row for Detailed Metrics */}
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Price Change (24h) */}
+              <Card className="h-full">
                 <CardHeader>
-                  <CardTitle>Investment Trend</CardTitle>
+                  <CardTitle>Price Change (24h)</CardTitle>
                 </CardHeader>
-                <CardContent className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={projectData}>
-                      <defs>
-                        <linearGradient
-                          id="colorInvestments"
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop
-                            offset="5%"
-                            stopColor="#ef4444"
-                            stopOpacity={0.8}
-                          />
-                          <stop
-                            offset="95%"
-                            stopColor="#ef4444"
-                            stopOpacity={0}
-                          />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Area
-                        type="monotone"
-                        dataKey="investments"
-                        stroke="#ef4444"
-                        fillOpacity={1}
-                        fill="url(#colorInvestments)"
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Investment Distribution</CardTitle>
-                </CardHeader>
-                <CardContent className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={pieData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {tronData
+                      ? `${tronData.market_data.price_change_percentage_24h.toFixed(2)}%`
+                      : "Loading..."}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Price change in the last 24 hours
+                  </p>
                 </CardContent>
               </Card>
             </div>
           </div>
-        )
+        );
+
       case "investments":
         return (
           <Card>
@@ -369,7 +343,7 @@ export function TronInvestorDashboardComponent() {
                           variant="outline"
                           className="text-red-600 border-red-600 hover:bg-red-50"
                         >
-                          Invest
+                          Fund
                         </Button>
                       </div>
                     )
@@ -439,7 +413,7 @@ export function TronInvestorDashboardComponent() {
         className={`w-full justify-start py-6 px-8 text-xl ${selectedTab === "investments" ? "bg-red-700" : ""}`}
         onClick={() => setSelectedTab("investments")}
       >
-        <DollarSign className="mr-4 h-6 w-6" /> Investments
+        <DollarSign className="mr-4 h-6 w-6" /> Funds
       </Button>
       <Button
         variant="ghost"
