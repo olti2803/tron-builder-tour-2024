@@ -74,6 +74,9 @@ export function TronInvestorDashboardComponent() {
   const [newProjectName, setNewProjectName] = useState("")
   const [newProjectDescription, setNewProjectDescription] = useState("")
   const [newProjectInvestment, setNewProjectInvestment] = useState("")
+  const [walletAddress, setWalletAddress] = useState(""); 
+
+  
 
   const handleCreateProject = () => {
   console.log("Project Created:", {
@@ -285,45 +288,61 @@ export function TronInvestorDashboardComponent() {
     </Button>
   </DialogTrigger>
   <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Create New Project</DialogTitle>
-    </DialogHeader>
-    <div className="grid gap-4 py-4">
-      {/* Project Name Input */}
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="project-name" className="text-right">Project Name</Label>
-        <Input
-          id="project-name"
-          value={newProjectName}
-          onChange={(e) => setNewProjectName(e.target.value)}
-          className="col-span-3"
-        />
-      </div>
-      {/* Project Description Input */}
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="project-description" className="text-right">Description</Label>
-        <Input
-          id="project-description"
-          value={newProjectDescription}
-          onChange={(e) => setNewProjectDescription(e.target.value)}
-          className="col-span-3"
-        />
-      </div>
-      {/* Goal Input */}
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="project-goal" className="text-right">Goal (TRX)</Label>
-        <Input
-          id="project-goal"
-          value={newProjectInvestment}
-          onChange={(e) => setNewProjectInvestment(e.target.value)}
-          className="col-span-3"
-        />
-      </div>
+  <DialogHeader>
+    <DialogTitle>Create New Project</DialogTitle>
+  </DialogHeader>
+  <div className="grid gap-4 py-4">
+    {/* Project Name Input */}
+    <div className="grid grid-cols-4 items-center gap-4">
+      <Label htmlFor="project-name" className="text-right">Project Name</Label>
+      <Input
+        id="project-name"
+        value={newProjectName}
+        onChange={(e) => setNewProjectName(e.target.value)}
+        className="col-span-3"
+      />
     </div>
-    <DialogFooter>
-      <Button onClick={handleCreateProject}>Create</Button>
-    </DialogFooter>
-  </DialogContent>
+    {/* Project Description Input */}
+    <div className="grid grid-cols-4 items-center gap-4">
+      <Label htmlFor="project-description" className="text-right">Project Description</Label>
+      <textarea
+        id="project-description"
+        value={newProjectDescription}
+        onChange={(e) => setNewProjectDescription(e.target.value)}
+        className="col-span-3 p-2 border border-gray-300 rounded"
+        rows={5}
+        minLength={50}
+        placeholder="Provide a detailed description (at least 50 characters)"
+      />
+    </div>
+    {/* Wallet Address Input */}
+    <div className="grid grid-cols-4 items-center gap-4">
+      <Label htmlFor="wallet-address" className="text-right">Wallet Address</Label>
+      <Input
+        id="wallet-address"
+        value={walletAddress}
+        onChange={(e) => setWalletAddress(e.target.value)}
+        className="col-span-3"
+      />
+    </div>
+    {/* Funding Goal Input */}
+    <div className="grid grid-cols-4 items-center gap-4">
+      <Label htmlFor="funding-goal" className="text-right">Funding Goal (TRX)</Label>
+      <Input
+        id="funding-goal"
+        type="number"  // Ensures only numbers are accepted
+        value={newProjectInvestment}
+        onChange={(e) => setNewProjectInvestment(e.target.value)}
+        className="col-span-3"
+      />
+    </div>
+  </div>
+  <DialogFooter>
+    <Button onClick={handleCreateProject}>Create</Button>
+  </DialogFooter>
+</DialogContent>
+
+
 </Dialog>
             </div>
             <Card>
