@@ -42,42 +42,54 @@ import {
 } from "lucide-react";
 import WalletConnection from "./wallet-connection"; // Adjust the import path accordingly
 
-// Replace with your actual contract address
-const contractAddress = 'TSKqM7bDSMDvedeSPdnWWRiZS8sLNH3PsX';
+const contractAddress = 'TMYsNwhV5UQt4FonNdhRSoTFgDue2NsHau';
 
-// Replace with your contract's ABI
 const contractABI = [
   {
     "inputs": [
       { "internalType": "string", "name": "_title", "type": "string" },
-      { "internalType": "string", "name": "_bio", "type": "string" },
-      { "internalType": "address payable", "name": "_campaignWallet", "type": "address" },
-      { "internalType": "uint256", "name": "_campaignGoal", "type": "uint256" }
+      { "internalType": "string", "name": "_description", "type": "string" },
+      { "internalType": "uint256", "name": "_fundingGoal", "type": "uint256" }
     ],
-    "name": "createProject",
+    "name": "createCampaign",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "_projectId", "type": "uint256" }],
-    "name": "donateTRX",
+    "inputs": [{ "internalType": "uint256", "name": "campaignId", "type": "uint256" }],
+    "name": "donateWithTRX",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "_projectId", "type": "uint256" }],
-    "name": "getProject",
+    "inputs": [{ "internalType": "uint256", "name": "campaignId", "type": "uint256" }],
+    "name": "freezeCampaign",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "campaigns",
     "outputs": [
+      { "internalType": "address", "name": "creator", "type": "address" },
       { "internalType": "string", "name": "title", "type": "string" },
-      { "internalType": "string", "name": "bio", "type": "string" },
-      { "internalType": "address", "name": "campaignWallet", "type": "address" },
-      { "internalType": "uint256", "name": "campaignGoal", "type": "uint256" },
-      { "internalType": "uint256", "name": "totalRaisedTRX", "type": "uint256" },
-      { "internalType": "address", "name": "raiser", "type": "address" },
-      { "internalType": "bool", "name": "active", "type": "bool" }
+      { "internalType": "string", "name": "description", "type": "string" },
+      { "internalType": "uint256", "name": "fundingGoal", "type": "uint256" },
+      { "internalType": "uint256", "name": "totalDonationsTRX", "type": "uint256" },
+      { "internalType": "uint256", "name": "totalDonationsUSD", "type": "uint256" },
+      { "internalType": "bool", "name": "funded", "type": "bool" },
+      { "internalType": "bool", "name": "frozen", "type": "bool" }
     ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "campaignCount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   }
@@ -114,21 +126,24 @@ export function TronInvestorDashboardComponent() {
       const contract = await tronWeb.contract(contractABI, contractAddress);
 
       const projectsArray = [];
-      for (let i = 1; i <= 4; i++) { // Fetch projects 1-4 (limit to 4 projects)
+      const campaignCount = await contract.campaignCount().call();
+      
+      for (let i = 0; i < campaignCount; i++) {
         try {
-          const project = await contract.getProject(i).call();
+          const campaign = await contract.campaigns(i).call();
           projectsArray.push({
             id: i,
-            title: project.title,
-            bio: project.bio,
-            campaignWallet: project.campaignWallet,
-            campaignGoal: tronWeb.fromSun(project.campaignGoal),  // Convert from SUN to TRX
-            totalRaisedTRX: tronWeb.fromSun(project.totalRaisedTRX),  // Convert from SUN to TRX
-            raiser: project.raiser,
-            active: project.active,
+            title: campaign.title,
+            description: campaign.description,
+            fundingGoal: tronWeb.fromSun(campaign.fundingGoal),
+            totalDonationsTRX: tronWeb.fromSun(campaign.totalDonationsTRX),
+            totalDonationsUSD: campaign.totalDonationsUSD / 1e6, // Assuming 6 decimal places for USD
+            creator: campaign.creator,
+            funded: campaign.funded,
+            frozen: campaign.frozen
           });
         } catch (error) {
-          console.error(`Error fetching project ${i}:`, error);
+          console.error(`Error fetching campaign ${i}:`, error);
         }
       }
       setProjects(projectsArray);
@@ -142,23 +157,21 @@ export function TronInvestorDashboardComponent() {
     }
     try {
       const contract = await window.tronWeb.contract(contractABI, contractAddress);
-      const tx = await contract.createProject(
+      const tx = await contract.createCampaign(
         newProjectName,
         newProjectDescription,
-        walletAddress,
         window.tronWeb.toSun(newProjectInvestment)
       ).send({
         from: window.tronWeb.defaultAddress.base58,
       });
-      console.log('Project Created:', tx);
+      console.log('Campaign Created:', tx);
       setNewProjectName('');
       setNewProjectDescription('');
       setNewProjectInvestment('');
-      setWalletAddress('');
       fetchProjects();
     } catch (error) {
-      console.error('Error creating project:', error);
-      alert('Error creating project: ' + error.message);
+      console.error('Error creating campaign:', error);
+      alert('Error creating campaign: ' + error.message);
     }
   };
 
@@ -173,7 +186,7 @@ export function TronInvestorDashboardComponent() {
     }
     try {
       const contract = await window.tronWeb.contract(contractABI, contractAddress);
-      const tx = await contract.donateTRX(fundingProjectId).send({
+      const tx = await contract.donateWithTRX(fundingProjectId).send({
         from: window.tronWeb.defaultAddress.base58,
         callValue: window.tronWeb.toSun(fundingAmount),
       });
@@ -184,6 +197,24 @@ export function TronInvestorDashboardComponent() {
     } catch (error) {
       console.error('Error donating to project:', error);
       alert('Error donating to project: ' + error.message);
+    }
+  };
+
+  const freezeCampaign = async (campaignId) => {
+    if (!window.tronWeb || !window.tronWeb.defaultAddress.base58) {
+      alert('Please connect your wallet first');
+      return;
+    }
+    try {
+      const contract = await window.tronWeb.contract(contractABI, contractAddress);
+      const tx = await contract.freezeCampaign(campaignId).send({
+        from: window.tronWeb.defaultAddress.base58,
+      });
+      console.log('Campaign frozen:', tx);
+      fetchProjects();
+    } catch (error) {
+      console.error('Error freezing campaign:', error);
+      alert('Error freezing campaign: ' + error.message);
     }
   };
 
@@ -369,12 +400,18 @@ export function TronInvestorDashboardComponent() {
                 <Card key={project.id}>
                   <CardHeader>
                     <CardTitle>{project.title}</CardTitle>
-                    <CardDescription>{project.bio}</CardDescription>
+                    <CardDescription>{project.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p>Goal: {project.campaignGoal} TRX</p>
-                    <p>Raised: {project.totalRaisedTRX} TRX</p>
-                    <Button onClick={() => handleFundProject(project.id)}>Fund</Button>
+                    <p>Goal: ${project.fundingGoal} USD</p>
+                    <p>Raised: {project.totalDonationsTRX} TRX (${project.totalDonationsUSD.toFixed(2)} USD)</p>
+                    <p>Status: {project.funded ? 'Funded' : (project.frozen ? 'Frozen' : 'Active')}</p>
+                    {!project.frozen && (
+                      <Button onClick={() => handleFundProject(project.id)}>Fund</Button>
+                    )}
+                    {window.tronWeb && window.tronWeb.defaultAddress.base58 === project.creator && !project.frozen && (
+                      <Button onClick={() => freezeCampaign(project.id)}>Freeze Campaign</Button>
+                    )}
                   </CardContent>
                 </Card>
               ))}
