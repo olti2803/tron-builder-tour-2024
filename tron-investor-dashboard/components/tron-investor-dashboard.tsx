@@ -104,6 +104,20 @@ type TronData = {
   };
   market_cap_rank: number;
 };
+// Define a type for your project structure
+type Project = {
+  id: number;
+  title: string;
+  description: string;
+  fundingGoal: number;
+  totalDonationsTRX: number;
+  totalDonationsUSD: number;
+  creator: string;
+  funded: boolean;
+  frozen: boolean;
+};
+
+// Use the defined Project[] type in useState
 
 
 export function TronInvestorDashboardComponent() {
@@ -113,7 +127,7 @@ export function TronInvestorDashboardComponent() {
   const [newProjectInvestment, setNewProjectInvestment] = useState("");
   const [walletAddress, setWalletAddress] = useState(""); 
   const [tronData, setTronData] = useState<TronData | null>(null); // <-- Update here
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<Project[]>([]); // <-- Update here
   const [fundingProjectId, setFundingProjectId] = useState(null);
   const [fundingAmount, setFundingAmount] = useState("");
 
