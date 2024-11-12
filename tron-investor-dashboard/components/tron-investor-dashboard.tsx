@@ -137,11 +137,11 @@ export function TronInvestorDashboardComponent() {
       const contract = await tronWeb.contract(contractABI, contractAddress);
   
       const projectsArray = [];
-      const campaignCount = await contract.campaignCount().call();
+      const campaignCount = await contract.campaignCount().call(); // This should work with the updated global.d.ts
   
       for (let i = 0; i < campaignCount; i++) {
         try {
-          const campaign = await contract.campaigns(i).call();
+          const campaign = await contract.campaigns(i).call(); // This should also work
           projectsArray.push({
             id: i,
             title: campaign.title,
@@ -160,6 +160,7 @@ export function TronInvestorDashboardComponent() {
       setProjects(projectsArray);
     }
   };
+  
   
 
   const handleCreateProject = async () => {
