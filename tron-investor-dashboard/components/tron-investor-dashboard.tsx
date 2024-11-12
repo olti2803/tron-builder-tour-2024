@@ -130,6 +130,7 @@ export function TronInvestorDashboardComponent() {
   const [projects, setProjects] = useState<Project[]>([]); // <-- Update here
   const [fundingProjectId, setFundingProjectId] = useState<number | null>(null);
   const [fundingAmount, setFundingAmount] = useState("");
+  
 
   useEffect(() => {
     if (selectedTab === "overview") {
@@ -230,7 +231,7 @@ export function TronInvestorDashboardComponent() {
     
   };
 
-  const freezeCampaign = async (campaignId) => {
+  const freezeCampaign = async (campaignId: number) => {
     if (!window.tronWeb || !window.tronWeb.defaultAddress.base58) {
       alert('Please connect your wallet first');
       return;
@@ -467,6 +468,8 @@ export function TronInvestorDashboardComponent() {
                     <div className="text-sm text-green-600">+8.5%</div>
                   </div>
                 </div>
+                {/* Progress bar with indicatorClassName */}
+                {/* @ts-ignore */}
                 <Progress
                   value={85}
                   className="h-2 bg-red-200"
@@ -479,6 +482,7 @@ export function TronInvestorDashboardComponent() {
                     <div className="text-sm text-red-600">-2.1%</div>
                   </div>
                 </div>
+                {/* @ts-ignore */}
                 <Progress
                   value={62}
                   className="h-2 bg-red-200"
@@ -491,11 +495,13 @@ export function TronInvestorDashboardComponent() {
                     <div className="text-sm text-green-600">+12.3%</div>
                   </div>
                 </div>
+                {/* @ts-ignore */}
                 <Progress
                   value={78}
                   className="h-2 bg-red-200"
                   indicatorClassName="bg-red-600"
                 />
+
               </div>
             </CardContent>
           </Card>
