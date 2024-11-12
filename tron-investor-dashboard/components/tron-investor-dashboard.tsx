@@ -203,9 +203,10 @@ export function TronInvestorDashboardComponent() {
     
   };
 
-  const handleFundProject = (projectId) => {
+  const handleFundProject = (projectId: number) => {
     setFundingProjectId(projectId);
   };
+  
 
   const donateToProject = async () => {
     if (!window.tronWeb || !window.tronWeb.defaultAddress.base58) {
