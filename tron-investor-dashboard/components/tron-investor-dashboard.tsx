@@ -196,10 +196,11 @@ export function TronInvestorDashboardComponent() {
       setNewProjectDescription('');
       setNewProjectInvestment('');
       fetchProjects();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating campaign:', error);
       alert('Error creating campaign: ' + error.message);
     }
+    
   };
 
   const handleFundProject = (projectId) => {
@@ -221,10 +222,11 @@ export function TronInvestorDashboardComponent() {
       setFundingAmount("");
       setFundingProjectId(null);
       fetchProjects();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error donating to project:', error);
       alert('Error donating to project: ' + error.message);
     }
+    
   };
 
   const freezeCampaign = async (campaignId) => {
@@ -239,10 +241,11 @@ export function TronInvestorDashboardComponent() {
       });
       console.log('Campaign frozen:', tx);
       fetchProjects();
-    } catch (error) {
-      console.error('Error freezing campaign:', error);
-      alert('Error freezing campaign: ' + error.message);
+    } catch (error: any) {
+      console.error('Error donating to project:', error);
+      alert('Error donating to project: ' + error.message);
     }
+    
   };
 
   const renderContent = () => {
