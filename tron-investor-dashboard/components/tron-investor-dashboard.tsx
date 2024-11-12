@@ -1,10 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react";
-import TronWeb from 'tronweb';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import axios from 'axios';
+// tron-investor-dashboard.tsx
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,17 +16,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getTronPriceData } from "@/lib/api";
-
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
 import {
   Coins,
   TrendingUp,
@@ -41,6 +36,7 @@ import {
   PlusCircle,
 } from "lucide-react";
 import WalletConnection from "./wallet-connection"; // Adjust the import path accordingly
+
 
 const contractAddress = 'TUg33aK94qt2j6UyG1gTFdmRN2dgXjxWgm'; //test
 
