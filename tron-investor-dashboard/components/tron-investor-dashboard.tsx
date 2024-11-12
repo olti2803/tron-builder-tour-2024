@@ -120,8 +120,8 @@ export function TronInvestorDashboardComponent() {
   useEffect(() => {
     if (selectedTab === "overview") {
       const fetchData = async () => {
-        const data: TronData = await getTronPriceData(); // Ensure data is typed as TronData
-        setTronData(data); // This should now work without type errors
+        const data: TronData = await getTronPriceData();
+        setTronData(data);
       };
       fetchData();
     }
