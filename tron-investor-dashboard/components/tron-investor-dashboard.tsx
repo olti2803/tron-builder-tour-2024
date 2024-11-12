@@ -42,7 +42,7 @@ import {
 } from "lucide-react";
 import WalletConnection from "./wallet-connection"; // Adjust the import path accordingly
 
-const contractAddress = 'TMYsNwhV5UQt4FonNdhRSoTFgDue2NsHau';
+const contractAddress = 'TUg33aK94qt2j6UyG1gTFdmRN2dgXjxWgm'; //test
 
 const contractABI = [
   {
