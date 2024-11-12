@@ -468,9 +468,7 @@ export function TronInvestorDashboardComponent() {
                     <div className="text-sm text-green-600">+8.5%</div>
                   </div>
                 </div>
-                {/* Progress bar with indicatorClassName */}
-                {/* @ts-ignore */}
-                {/* @ts-expect-error */}
+                {/* @ts-expect-error: Progress component expects specific styling in this project */}
                 <Progress
                   value={85}
                   className="h-2 bg-red-200"
@@ -483,7 +481,7 @@ export function TronInvestorDashboardComponent() {
                     <div className="text-sm text-red-600">-2.1%</div>
                   </div>
                 </div>
-                {/* @ts-expect-error */}
+                {/* @ts-expect-error: Progress component expects specific styling in this project */}
                 <Progress
                   value={62}
                   className="h-2 bg-red-200"
@@ -496,12 +494,13 @@ export function TronInvestorDashboardComponent() {
                     <div className="text-sm text-green-600">+12.3%</div>
                   </div>
                 </div>
-                {/* @ts-expect-error */}
+                {/* @ts-expect-error: Progress component expects specific styling in this project */}
                 <Progress
                   value={78}
                   className="h-2 bg-red-200"
                   indicatorClassName="bg-red-600"
                 />
+
 
 
               </div>
