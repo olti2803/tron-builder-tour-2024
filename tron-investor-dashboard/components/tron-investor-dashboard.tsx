@@ -132,13 +132,13 @@ export function TronInvestorDashboardComponent() {
   }, []);
 
   const fetchProjects = async () => {
-    if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+    if (typeof window !== 'undefined' && window.tronWeb && window.tronWeb.defaultAddress.base58) {
       const tronWeb = window.tronWeb;
       const contract = await tronWeb.contract(contractABI, contractAddress);
-
+  
       const projectsArray = [];
       const campaignCount = await contract.campaignCount().call();
-      
+  
       for (let i = 0; i < campaignCount; i++) {
         try {
           const campaign = await contract.campaigns(i).call();
@@ -148,10 +148,10 @@ export function TronInvestorDashboardComponent() {
             description: campaign.description,
             fundingGoal: tronWeb.fromSun(campaign.fundingGoal),
             totalDonationsTRX: tronWeb.fromSun(campaign.totalDonationsTRX),
-            totalDonationsUSD: campaign.totalDonationsUSD / 1e6, // Assuming 6 decimal places for USD
+            totalDonationsUSD: campaign.totalDonationsUSD / 1e6,
             creator: campaign.creator,
             funded: campaign.funded,
-            frozen: campaign.frozen
+            frozen: campaign.frozen,
           });
         } catch (error) {
           console.error(`Error fetching campaign ${i}:`, error);
@@ -160,6 +160,7 @@ export function TronInvestorDashboardComponent() {
       setProjects(projectsArray);
     }
   };
+  
 
   const handleCreateProject = async () => {
     if (!window.tronWeb || !window.tronWeb.defaultAddress.base58) {
