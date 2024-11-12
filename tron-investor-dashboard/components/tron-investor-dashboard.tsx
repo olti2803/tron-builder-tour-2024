@@ -91,6 +91,20 @@ const contractABI = [
     "type": "function"
   }
 ];
+type TronData = {
+  market_data: {
+    current_price: {
+      usd: number;
+    };
+    circulating_supply: number;
+    total_volume: {
+      usd: number;
+    };
+    price_change_percentage_24h: number;
+  };
+  market_cap_rank: number;
+};
+
 
 export function TronInvestorDashboardComponent() {
   const [selectedTab, setSelectedTab] = useState("overview");
@@ -98,7 +112,7 @@ export function TronInvestorDashboardComponent() {
   const [newProjectDescription, setNewProjectDescription] = useState("");
   const [newProjectInvestment, setNewProjectInvestment] = useState("");
   const [walletAddress, setWalletAddress] = useState(""); 
-  const [tronData, setTronData] = useState(null);
+  const [tronData, setTronData] = useState<TronData | null>(null); // <-- Update here
   const [projects, setProjects] = useState([]);
   const [fundingProjectId, setFundingProjectId] = useState(null);
   const [fundingAmount, setFundingAmount] = useState("");
@@ -106,8 +120,8 @@ export function TronInvestorDashboardComponent() {
   useEffect(() => {
     if (selectedTab === "overview") {
       const fetchData = async () => {
-        const data = await getTronPriceData();
-        setTronData(data);
+        const data: TronData = await getTronPriceData(); // Ensure data is typed as TronData
+        setTronData(data); // This should now work without type errors
       };
       fetchData();
     }
