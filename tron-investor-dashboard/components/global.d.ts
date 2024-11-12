@@ -1,7 +1,7 @@
 // global.d.ts
 
 interface TronWebContract {
-    call: () => Promise<any>;
+    call: () => Promise<unknown>; // Replaced `any` with `unknown`
   }
   
   interface TronWeb {
