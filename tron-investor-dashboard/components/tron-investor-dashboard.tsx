@@ -468,38 +468,29 @@ export function TronInvestorDashboardComponent() {
                     <div className="text-sm text-green-600">+8.5%</div>
                   </div>
                 </div>
-                {/* @ts-expect-error: Progress component expects specific styling in this project */}
-                <Progress
-                  value={85}
-                  className="h-2 bg-red-200"
-                  indicatorClassName="bg-red-600"
-                />
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">NFT Marketplace</span>
-                  <div className="text-right">
-                    <div className="font-medium">30,000 TRX</div>
-                    <div className="text-sm text-red-600">-2.1%</div>
-                  </div>
-                </div>
-                {/* @ts-expect-error: Progress component expects specific styling in this project */}
-                <Progress
-                  value={62}
-                  className="h-2 bg-red-200"
-                  indicatorClassName="bg-red-600"
-                />
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">TRON Gaming Platform</span>
-                  <div className="text-right">
-                    <div className="font-medium">75,000 TRX</div>
-                    <div className="text-sm text-green-600">+12.3%</div>
-                  </div>
-                </div>
-                {/* @ts-expect-error: Progress component expects specific styling in this project */}
-                <Progress
-                  value={78}
-                  className="h-2 bg-red-200"
-                  indicatorClassName="bg-red-600"
-                />
+                <div className="relative h-2 bg-red-200">
+  <div className="absolute top-0 left-0 h-2 bg-red-600" style={{ width: '85%' }} />
+</div>
+<div className="flex items-center justify-between">
+  <span className="font-medium">NFT Marketplace</span>
+  <div className="text-right">
+    <div className="font-medium">30,000 TRX</div>
+    <div className="text-sm text-red-600">-2.1%</div>
+  </div>
+</div>
+<div className="relative h-2 bg-red-200">
+  <div className="absolute top-0 left-0 h-2 bg-red-600" style={{ width: '62%' }} />
+</div>
+<div className="flex items-center justify-between">
+  <span className="font-medium">TRON Gaming Platform</span>
+  <div className="text-right">
+    <div className="font-medium">75,000 TRX</div>
+    <div className="text-sm text-green-600">+12.3%</div>
+  </div>
+</div>
+<div className="relative h-2 bg-red-200">
+  <div className="absolute top-0 left-0 h-2 bg-red-600" style={{ width: '78%' }} />
+</div>
 
 
 
