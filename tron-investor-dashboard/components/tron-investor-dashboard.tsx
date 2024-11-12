@@ -36,6 +36,7 @@ import {
   PlusCircle,
 } from "lucide-react";
 import WalletConnection from "./wallet-connection"; // Adjust the import path accordingly
+import Image from 'next/image';
 
 
 const contractAddress = 'TUg33aK94qt2j6UyG1gTFdmRN2dgXjxWgm'; //test
@@ -222,9 +223,8 @@ export function TronInvestorDashboardComponent() {
             {/* Overview Header Section */}
             <div className="bg-red-100 p-6 rounded-lg text-center">
               <h1 className="text-3xl font-bold text-red-600">TRON - FundYou Overview</h1>
-              <p className="text-lg mt-2 text-gray-700">
-                Welcome to the TRON Investor Dashboard! Here you can find real-time data on TRON's cryptocurrency, including current price, market trends, and volume.
-              </p>
+              <p>Welcome to the TRON Investor Dashboard! Here you can find real-time data on TRON&apos;s cryptocurrency, including current price, market trends, and volume.</p>
+
             </div>
 
             {/* Card Sections with 2 Cards per Row */}
@@ -508,8 +508,8 @@ export function TronInvestorDashboardComponent() {
       <div className="w-64 md:w-48 lg:w-56 xl:w-64 bg-red-600 text-white p-4 h-screen flex flex-col justify-between">
         <div className="flex flex-col space-y-8">
           <div className="flex items-center mb-2">
-            <img src="/Minimalist_TRON_FundYou_logo.png" alt="TRON-FundYou Logo" className="w-20 h-20 mr-2" />
-            <span className="text-xl font-normal">TRON - FundYou</span>
+          <Image src="/Minimalist_TRON_FundYou_logo.png" alt="TRON-FundYou Logo" width={80} height={80} className="mr-2" />
+          <span className="text-xl font-normal">TRON - FundYou</span>
           </div>
           <hr className="border-gray-400 mb-4 w-full" />
           <nav className="space-y-2">
