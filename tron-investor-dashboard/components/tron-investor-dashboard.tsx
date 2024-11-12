@@ -470,6 +470,7 @@ export function TronInvestorDashboardComponent() {
                 </div>
                 {/* Progress bar with indicatorClassName */}
                 {/* @ts-ignore */}
+                {/* @ts-expect-error */}
                 <Progress
                   value={85}
                   className="h-2 bg-red-200"
@@ -482,7 +483,7 @@ export function TronInvestorDashboardComponent() {
                     <div className="text-sm text-red-600">-2.1%</div>
                   </div>
                 </div>
-                {/* @ts-ignore */}
+                {/* @ts-expect-error */}
                 <Progress
                   value={62}
                   className="h-2 bg-red-200"
@@ -495,12 +496,13 @@ export function TronInvestorDashboardComponent() {
                     <div className="text-sm text-green-600">+12.3%</div>
                   </div>
                 </div>
-                {/* @ts-ignore */}
+                {/* @ts-expect-error */}
                 <Progress
                   value={78}
                   className="h-2 bg-red-200"
                   indicatorClassName="bg-red-600"
                 />
+
 
               </div>
             </CardContent>
