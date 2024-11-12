@@ -1,4 +1,5 @@
 // global.d.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 interface TronWebContract {
     campaignCount: () => { call: () => Promise<number> };
