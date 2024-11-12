@@ -128,7 +128,7 @@ export function TronInvestorDashboardComponent() {
   const [walletAddress, setWalletAddress] = useState(""); 
   const [tronData, setTronData] = useState<TronData | null>(null); // <-- Update here
   const [projects, setProjects] = useState<Project[]>([]); // <-- Update here
-  const [fundingProjectId, setFundingProjectId] = useState(null);
+  const [fundingProjectId, setFundingProjectId] = useState<number | null>(null);
   const [fundingAmount, setFundingAmount] = useState("");
 
   useEffect(() => {
